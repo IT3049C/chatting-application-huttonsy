@@ -1,5 +1,5 @@
 const nameInput = document.getElementById(`my-name-input`);
-const myMessage = document.getElementById(`my-message`);
+const myMessage = document.getElementById(`my-message-input`);
 const sendButton = document.getElementById(`send-button`);
 const chatBox = document.getElementById(`chat`);
 const serverURL = `https://it3049c-chat.fly.dev/messages`;
@@ -42,11 +42,13 @@ async function fetchMessages() {
 async function updateMessages() {
   const messages = await fetchMessages();
   let formattedMessages = ``;
-  messages.forEach(message => {
+  messages.forEach((message) => {
     formattedMessages += formatMessage(message, nameInput.value);
   });
-  chatBox.innerHTML = formattedMessages;
+
+  chatBox.innerHTML = formattedMessages; // Ensure chat updates
 }
+
 
 const MILLISECONDS_IN_TEN_SECONDS = 10000;
 setInterval(updateMessages, MILLISECONDS_IN_TEN_SECONDS);
@@ -55,19 +57,24 @@ async function sendMessages(username, text) {
   const newMessage = {
     sender: username,
     text: text,
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 
-  await fetch(serverURL, {
-    method: `POST`,
-    headers: {
-      'Content-Type': `application/json`
-    },
-    body: JSON.stringify(newMessage)
-  });
+  try {
+    await fetch(serverURL, {
+      method: `POST`,
+      headers: {
+        "Content-Type": `application/json`,
+      },
+      body: JSON.stringify(newMessage),
+    });
 
-  updateMessages().catch(console.error);
+    await updateMessages(); // Ensure UI refresh after sending
+  } catch (error) {
+    console.error(`Error sending message:`, error);
+  }
 }
+
 // Example
 sendButton.addEventListener(`click`, function(event) {
   event.preventDefault();
