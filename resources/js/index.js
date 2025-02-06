@@ -4,7 +4,6 @@ const sendButton = document.getElementById(`send-button`);
 const chatBox = document.getElementById(`chat`);
 const serverURL = `https://it3049c-chat.fly.dev/messages`;
 
-// Example format function
 function formatMessage(message, myNameInput) {
   const time = new Date(message.timestamp);
   const formattedTime = `${time.getHours()}:${time.getMinutes()}`;
@@ -69,13 +68,12 @@ async function sendMessages(username, text) {
       body: JSON.stringify(newMessage),
     });
 
-    await updateMessages(); // Ensure UI refresh after sending
+    await updateMessages(); g;
   } catch (error) {
     console.error(`Error sending message:`, error);
   }
 }
 
-// Example
 sendButton.addEventListener(`click`, function(event) {
   event.preventDefault();
   const sender = nameInput.value;
