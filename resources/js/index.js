@@ -1,8 +1,8 @@
-// Example:
 const nameInput = document.getElementById(`my-name-input`);
 const myMessage = document.getElementById(`my-message`);
 const sendButton = document.getElementById(`send-button`);
 const chatBox = document.getElementById(`chat`);
+const serverURL = `https://it3049c-chat.fly.dev/messages`;
 
 // Example format function
 function formatMessage(message, myNameInput) {
@@ -33,32 +33,14 @@ function formatMessage(message, myNameInput) {
     `;
   }
 }
-// Mocked version returning array of messages
-function fetchMessages() {
-  return [
-    {
-      id: 1,
-      text: `This is my message`,
-      sender: `Yahya Gilany`,
-      timestamp: 1537410673072
-    },
-    {
-      id: 2,
-      text: `This is another message`,
-      sender: `Yahya Gilany`,
-      timestamp: 1537410673072
-    },
-    {
-      id: 3,
-      text: `This is a message from someone else`,
-      sender: `Someone Else`,
-      timestamp: 1537410673072
-    }
-  ];
+
+async function fetchMessages() {
+  const response = await fetch(serverURL);
+  return response.json();
 }
-// Example
-function updateMessages() {
-  const messages = fetchMessages();
+
+async function updateMessages() {
+  const messages = await fetchMessages();
   let formattedMessages = ``;
   messages.forEach(message => {
     formattedMessages += formatMessage(message, nameInput.value);
@@ -66,8 +48,26 @@ function updateMessages() {
   chatBox.innerHTML = formattedMessages;
 }
 
-updateMessages();
+const MILLISECONDS_IN_TEN_SECONDS = 10000;
+setInterval(updateMessages, MILLISECONDS_IN_TEN_SECONDS);
 
+async function sendMessages(username, text) {
+  const newMessage = {
+    sender: username,
+    text: text,
+    timestamp: new Date()
+  };
+
+  await fetch(serverURL, {
+    method: `POST`,
+    headers: {
+      'Content-Type': `application/json`
+    },
+    body: JSON.stringify(newMessage)
+  });
+
+  updateMessages().catch(console.error);
+}
 // Example
 sendButton.addEventListener(`click`, function(event) {
   event.preventDefault();
@@ -76,44 +76,3 @@ sendButton.addEventListener(`click`, function(event) {
   sendMessages(sender, message);
   myMessage.value = ``;
 });
-const serverURL = `https://it3049c-chat.fly.dev/messages`;
-
-function fetchMessages() {
-  return fetch(serverURL)
-    .then(response => response.json());
-}
-const serverURL = `https://it3049c-chat.fly.dev/messages`;
-
-async function fetchMessages() {
-  const response = await fetch(serverURL);
-  return response.json();
-}
-async function updateMessages() {
-  const messages = await fetchMessages();
-  // ...
-}
-const message {
-  "id": 1,
-  "text": "This is my message",
-  "timestamp": 1537410673072
-}
-updateMessages();
-
-const MILLISECONDS_IN_TEN_SECONDS = 10000;
-setInterval(updateMessages, MILLISECONDS_IN_TEN_SECONDS);
-
-function sendMessages(username, text) {
-  const newMessage = {
-    sender: username,
-    text: text,
-    timestamp: new Date()
-  };
-
-  fetch(serverURL, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newMessage)
-  });
-}
